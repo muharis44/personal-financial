@@ -12,12 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -40,7 +34,6 @@ import {
 import {
   Search,
   Filter,
-  MoreVertical,
   Edit,
   Trash2,
   ArrowUpRight,
@@ -60,6 +53,7 @@ export function TransactionList() {
   const [yearFilter, setYearFilter] = useState(getCurrentYear().toString());
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [deletingTransaction, setDeletingTransaction] =
     useState<Transaction | null>(null);
 
@@ -245,28 +239,25 @@ export function TransactionList() {
                       {maskAmount(formatCurrency(transaction.amount))}
                     </span>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => setEditingTransaction(transaction)}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => setDeletingTransaction(transaction)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        setEditingTransaction(transaction);
+                        setIsEditOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => setDeletingTransaction(transaction)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -279,8 +270,17 @@ export function TransactionList() {
       {editingTransaction && (
         <TransactionForm
           transaction={editingTransaction}
-          onClose={() => setEditingTransaction(null)}
-          trigger={<span className="hidden" />}
+          open={isEditOpen}
+          onOpenChange={(open) => {
+            setIsEditOpen(open);
+            if (!open) {
+              setEditingTransaction(null);
+            }
+          }}
+          onClose={() => {
+            setEditingTransaction(null);
+            setIsEditOpen(false);
+          }}
         />
       )}
 
