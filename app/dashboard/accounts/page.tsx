@@ -18,7 +18,7 @@ export default function AccountsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
+  const [editingAccount, setEditingAccount] = useState<Account | undefined>(undefined)
   const [isTransferOpen, setIsTransferOpen] = useState(false)
 
   const loadAccounts = async () => {
@@ -47,7 +47,15 @@ export default function AccountsPage() {
 
   const handleCloseEdit = () => {
     setIsEditOpen(false)
-    setEditingAccount(null)
+    setEditingAccount(undefined)
+  }
+
+  const handleCloseAdd = () => {
+    setIsAddOpen(false)
+  }
+
+  const handleCloseTransfer = () => {
+    setIsTransferOpen(false)
   }
 
   const getAccountIcon = (type: string) => {
@@ -67,9 +75,9 @@ export default function AccountsPage() {
           <p className="text-muted-foreground">Kelola rekening bank, e-wallet, dan uang cash</p>
         </div>
         <div className="flex gap-2">
-          <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
+          <Dialog open={isTransferOpen} onOpenChange={handleCloseTransfer}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => setIsTransferOpen(true)}>
                 <ArrowLeftRight className="h-4 w-4 mr-2" />
                 Transfer
               </Button>
@@ -79,17 +87,18 @@ export default function AccountsPage() {
                 <DialogTitle>Transfer Antar Akun</DialogTitle>
               </DialogHeader>
               <AccountTransferDialog
+                key={isTransferOpen ? "open" : "closed"}
                 accounts={accounts}
                 onSuccess={() => {
-                  setIsTransferOpen(false)
+                  handleCloseTransfer()
                   loadAccounts()
                 }}
               />
             </DialogContent>
           </Dialog>
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+          <Dialog open={isAddOpen} onOpenChange={handleCloseAdd}>
             <DialogTrigger asChild>
-              <Button>
+              <Button onClick={() => setIsAddOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Tambah Akun
               </Button>
@@ -99,26 +108,20 @@ export default function AccountsPage() {
                 <DialogTitle>Tambah Akun Baru</DialogTitle>
               </DialogHeader>
               <AccountForm
+                key={isAddOpen ? "open" : "closed"}
                 onSuccess={() => {
-                  setIsAddOpen(false)
+                  handleCloseAdd()
                   loadAccounts()
                 }}
               />
             </DialogContent>
           </Dialog>
-          {editingAccount && (
-            <Dialog
-              open={isEditOpen}
-              onOpenChange={(open) => {
-                if (!open) {
-                  handleCloseEdit()
-                }
-              }}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Edit Akun</DialogTitle>
-                </DialogHeader>
+          <Dialog open={isEditOpen} onOpenChange={handleCloseEdit}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Akun</DialogTitle>
+              </DialogHeader>
+              {editingAccount && (
                 <AccountForm
                   key={editingAccount.id}
                   account={editingAccount}
@@ -127,9 +130,9 @@ export default function AccountsPage() {
                     loadAccounts()
                   }}
                 />
-              </DialogContent>
-            </Dialog>
-          )}
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
