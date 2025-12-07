@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +21,7 @@ import { useFinance } from "@/contexts/finance-context"
 import { usePrivacy } from "@/contexts/privacy-context"
 import { BudgetForm } from "./budget-form"
 import { formatCurrency, getCurrentMonth, getCurrentYear, getMonthName } from "@/lib/format"
-import { PiggyBank, MoreVertical, Edit, Trash2, AlertTriangle, CheckCircle, TrendingDown } from "lucide-react"
+import { PiggyBank, Edit, Trash2, AlertTriangle, CheckCircle, TrendingDown } from "lucide-react"
 import type { Budget } from "@/types"
 
 export function BudgetOverview() {
@@ -31,6 +30,7 @@ export function BudgetOverview() {
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth().toString())
   const [selectedYear, setSelectedYear] = useState(getCurrentYear().toString())
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null)
 
   const month = Number.parseInt(selectedMonth)
@@ -121,23 +121,26 @@ export function BudgetOverview() {
                   </SelectContent>
                 </Select>
                 {currentBudget ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setEditingBudget(currentBudget)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive" onClick={() => setDeletingBudget(currentBudget)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        setEditingBudget(currentBudget);
+                        setIsEditOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeletingBudget(currentBudget)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ) : (
                   <BudgetForm />
                 )}
@@ -261,8 +264,17 @@ export function BudgetOverview() {
       {editingBudget && (
         <BudgetForm
           budget={editingBudget}
-          onClose={() => setEditingBudget(null)}
-          trigger={<span className="hidden" />}
+          open={isEditOpen}
+          onOpenChange={(open) => {
+            setIsEditOpen(open);
+            if (!open) {
+              setEditingBudget(null);
+            }
+          }}
+          onClose={() => {
+            setEditingBudget(null);
+            setIsEditOpen(false);
+          }}
         />
       )}
 

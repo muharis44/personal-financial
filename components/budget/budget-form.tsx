@@ -17,12 +17,17 @@ interface BudgetFormProps {
   budget?: Budget
   onClose?: () => void
   trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function BudgetForm({ budget, onClose, trigger }: BudgetFormProps) {
+export function BudgetForm({ budget, onClose, trigger, open: controlledOpen, onOpenChange }: BudgetFormProps) {
   const { addBudget, updateBudget } = useFinance()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
 
   const [formData, setFormData] = useState({
     amount: budget?.amount?.toString() || "",
@@ -40,11 +45,6 @@ export function BudgetForm({ budget, onClose, trigger }: BudgetFormProps) {
     }
   }, [budget])
 
-  useEffect(() => {
-    if (budget && !open) {
-      setOpen(true)
-    }
-  }, [budget, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,13 +84,7 @@ export function BudgetForm({ budget, onClose, trigger }: BudgetFormProps) {
   }))
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(newOpen) => {
-        setOpen(newOpen)
-        if (!newOpen) onClose?.()
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
           <Button>
