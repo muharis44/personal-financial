@@ -4,22 +4,49 @@ import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Wallet, CreditCard, Smartphone, Banknote, ArrowLeftRight } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AccountForm } from "@/components/accounts/account-form"
 import { AccountCard } from "@/components/accounts/account-card"
 import { AccountTransferDialog } from "@/components/accounts/account-transfer-dialog"
+import { toast } from "sonner"
 import type { Account } from "@/types"
+
+const ACCOUNT_TYPES = [
+  { value: "cash", label: "Uang Tunai" },
+  { value: "bank", label: "Rekening Bank" },
+  { value: "e-wallet", label: "E-Wallet" },
+  { value: "credit-card", label: "Kartu Kredit" },
+]
+
+const COLORS = [
+  "#10b981",
+  "#3b82f6",
+  "#8b5cf6",
+  "#f59e0b",
+  "#ef4444",
+  "#ec4899",
+]
 
 export default function AccountsPage() {
   const { user } = useAuth()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [totalBalance, setTotalBalance] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
-  const [isAddOpen, setIsAddOpen] = useState(false)
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<Account | undefined>(undefined)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isTransferOpen, setIsTransferOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    type: "cash",
+    balance: "0",
+    currency: "IDR",
+    color: "#10b981",
+    icon: "Wallet",
+  })
 
   const loadAccounts = async () => {
     if (!user) return
@@ -40,26 +67,80 @@ export default function AccountsPage() {
     loadAccounts()
   }, [user])
 
+  useEffect(() => {
+    if (editingAccount) {
+      setFormData({
+        name: editingAccount.name,
+        type: editingAccount.type,
+        balance: editingAccount.balance.toString(),
+        currency: editingAccount.currency,
+        color: editingAccount.color,
+        icon: editingAccount.icon,
+      })
+      setIsFormOpen(true)
+    }
+  }, [editingAccount])
+
   const handleEdit = (account: Account) => {
     setEditingAccount(account)
-    setIsEditOpen(true)
   }
 
-  const handleCloseEdit = () => {
-    setIsEditOpen(false)
-    setEditingAccount(undefined)
+  const handleOpenChange = (open: boolean) => {
+    setIsFormOpen(open)
+    if (!open) {
+      setEditingAccount(null)
+      setFormData({
+        name: "",
+        type: "cash",
+        balance: "0",
+        currency: "IDR",
+        color: "#10b981",
+        icon: "Wallet",
+      })
+    }
   }
 
-  const handleCloseAdd = () => {
-    setIsAddOpen(false)
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
 
-  const handleAddOpen = (open: boolean) => {
-    setIsAddOpen(open)
-  }
+    setIsSaving(true)
+    try {
+      const url = editingAccount ? `/api/accounts/${editingAccount.id}` : "/api/accounts"
+      const method = editingAccount ? "PUT" : "POST"
 
-  const handleCloseTransfer = () => {
-    setIsTransferOpen(false)
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          ...formData,
+          balance: parseFloat(formData.balance) || 0,
+        }),
+      })
+
+      if (res.ok) {
+        toast.success(editingAccount ? "Akun berhasil diupdate" : "Akun berhasil ditambahkan")
+        setIsFormOpen(false)
+        setEditingAccount(null)
+        setFormData({
+          name: "",
+          type: "cash",
+          balance: "0",
+          currency: "IDR",
+          color: "#10b981",
+          icon: "Wallet",
+        })
+        loadAccounts()
+      } else {
+        toast.error("Gagal menyimpan akun")
+      }
+    } catch (error) {
+      console.error("Error saving account:", error)
+      toast.error("Terjadi kesalahan")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleTransferOpen = (open: boolean) => {
@@ -98,13 +179,13 @@ export default function AccountsPage() {
                 key={isTransferOpen ? "open" : "closed"}
                 accounts={accounts}
                 onSuccess={() => {
-                  handleCloseTransfer()
+                  setIsTransferOpen(false)
                   loadAccounts()
                 }}
               />
             </DialogContent>
           </Dialog>
-          <Dialog open={isAddOpen} onOpenChange={handleAddOpen}>
+          <Dialog open={isFormOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -113,32 +194,76 @@ export default function AccountsPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Tambah Akun Baru</DialogTitle>
+                <DialogTitle>{editingAccount ? "Edit Akun" : "Tambah Akun Baru"}</DialogTitle>
               </DialogHeader>
-              <AccountForm
-                key={isAddOpen ? "open" : "closed"}
-                onSuccess={() => {
-                  handleCloseAdd()
-                  loadAccounts()
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-          <Dialog open={isEditOpen} onOpenChange={handleCloseEdit}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Akun</DialogTitle>
-              </DialogHeader>
-              {editingAccount && (
-                <AccountForm
-                  key={editingAccount.id}
-                  account={editingAccount}
-                  onSuccess={() => {
-                    handleCloseEdit()
-                    loadAccounts()
-                  }}
-                />
-              )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Nama Akun</Label>
+                  <Input
+                    id="name"
+                    placeholder="Contoh: BCA, GoPay, Cash"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="type">Tipe Akun</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(value) => setFormData({ ...formData, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih tipe akun" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ACCOUNT_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="balance">Saldo Awal</Label>
+                  <Input
+                    id="balance"
+                    type="number"
+                    step="0.01"
+                    placeholder="0"
+                    value={formData.balance}
+                    onChange={(e) =>
+                      setFormData({ ...formData, balance: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>Warna</Label>
+                  <div className="flex gap-2 mt-2">
+                    {COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`w-8 h-8 rounded-full border-2 ${
+                          formData.color === color
+                            ? "border-foreground"
+                            : "border-transparent"
+                        }`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setFormData({ ...formData, color })}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isSaving}>
+                  {isSaving ? "Menyimpan..." : editingAccount ? "Update Akun" : "Simpan Akun"}
+                </Button>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
@@ -167,7 +292,7 @@ export default function AccountsPage() {
           <p className="text-muted-foreground mb-4">
             Tambahkan akun pertama Anda untuk mulai tracking keuangan
           </p>
-          <Button onClick={() => setIsAddOpen(true)}>
+          <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Akun Pertama
           </Button>
