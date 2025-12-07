@@ -16,9 +16,10 @@ interface AccountCardProps {
   account: Account;
   icon: React.ReactNode;
   onUpdate: () => void;
+  onEdit: (account: Account) => void;
 }
 
-export function AccountCard({ account, icon, onUpdate }: AccountCardProps) {
+export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProps) {
   const handleDelete = async () => {
     if (!confirm(`Hapus akun ${account.name}?`)) return;
 
@@ -51,7 +52,7 @@ export function AccountCard({ account, icon, onUpdate }: AccountCardProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(account)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>

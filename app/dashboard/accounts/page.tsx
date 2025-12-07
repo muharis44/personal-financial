@@ -17,6 +17,8 @@ export default function AccountsPage() {
   const [totalBalance, setTotalBalance] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isTransferOpen, setIsTransferOpen] = useState(false)
 
   const loadAccounts = async () => {
@@ -37,6 +39,11 @@ export default function AccountsPage() {
   useEffect(() => {
     loadAccounts()
   }, [user])
+
+  const handleEdit = (account: Account) => {
+    setEditingAccount(account)
+    setIsEditOpen(true)
+  }
 
   const getAccountIcon = (type: string) => {
     switch (type) {
@@ -94,6 +101,21 @@ export default function AccountsPage() {
               />
             </DialogContent>
           </Dialog>
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Akun</DialogTitle>
+              </DialogHeader>
+              <AccountForm
+                account={editingAccount || undefined}
+                onSuccess={() => {
+                  setIsEditOpen(false)
+                  setEditingAccount(null)
+                  loadAccounts()
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -133,6 +155,7 @@ export default function AccountsPage() {
               account={account}
               icon={getAccountIcon(account.type)}
               onUpdate={loadAccounts}
+              onEdit={handleEdit}
             />
           ))}
         </div>

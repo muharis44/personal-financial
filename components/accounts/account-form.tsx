@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import type { Account } from "@/types";
 
 interface AccountFormProps {
+  account?: Account;
   onSuccess: () => void;
 }
 
@@ -43,7 +45,7 @@ const COLORS = [
   "#ec4899",
 ];
 
-export function AccountForm({ onSuccess }: AccountFormProps) {
+export function AccountForm({ account, onSuccess }: AccountFormProps) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,14 +57,30 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
     icon: "Wallet",
   });
 
+  useEffect(() => {
+    if (account) {
+      setFormData({
+        name: account.name,
+        type: account.type,
+        balance: account.balance.toString(),
+        currency: account.currency,
+        color: account.color,
+        icon: account.icon,
+      });
+    }
+  }, [account]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/accounts", {
-        method: "POST",
+      const url = account ? `/api/accounts/${account.id}` : "/api/accounts";
+      const method = account ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
@@ -73,11 +91,13 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
 
       if (res.ok) {
         onSuccess();
-        toast.success("berhasil Tambah account");
+        toast.success(account ? "Akun berhasil diupdate" : "Akun berhasil ditambahkan");
+      } else {
+        toast.error("Gagal menyimpan akun");
       }
     } catch (error) {
-      console.error("Error creating account:", error);
-      toast.error(error);
+      console.error("Error saving account:", error);
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +169,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Menyimpan..." : "Simpan Akun"}
+        {isLoading ? "Menyimpan..." : account ? "Update Akun" : "Simpan Akun"}
       </Button>
     </form>
   );
