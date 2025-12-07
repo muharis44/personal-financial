@@ -33,6 +33,16 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
     }
   };
 
+  const getTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      'cash': 'Tunai',
+      'bank': 'Bank',
+      'e-wallet': 'E-Wallet',
+      'credit-card': 'Kartu Kredit'
+    };
+    return labels[type] || type;
+  };
+
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">
       <div className="flex justify-between items-start mb-4">
@@ -67,9 +77,9 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
         </DropdownMenu>
       </div>
 
-      <h3 className="font-semibold text-lg mb-1">{account.name}</h3>
-      <Badge variant="secondary" className="mb-4">
-        {account.type}
+      <h3 className="font-semibold text-lg mb-2">{account.name}</h3>
+      <Badge variant="secondary" className="mb-3">
+        {getTypeLabel(account.type)}
       </Badge>
 
       <div className="mt-4">
