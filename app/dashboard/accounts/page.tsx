@@ -45,6 +45,11 @@ export default function AccountsPage() {
     setIsEditOpen(true)
   }
 
+  const handleCloseEdit = () => {
+    setIsEditOpen(false)
+    setEditingAccount(null)
+  }
+
   const getAccountIcon = (type: string) => {
     switch (type) {
       case 'bank': return <CreditCard className="h-5 w-5" />
@@ -101,30 +106,30 @@ export default function AccountsPage() {
               />
             </DialogContent>
           </Dialog>
-          <Dialog
-            open={isEditOpen}
-            onOpenChange={(open) => {
-              setIsEditOpen(open)
-              if (!open) {
-                setTimeout(() => setEditingAccount(null), 200)
-              }
-            }}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Akun</DialogTitle>
-              </DialogHeader>
-              <AccountForm
-                key={editingAccount?.id || 'new'}
-                account={editingAccount || undefined}
-                onSuccess={() => {
-                  setIsEditOpen(false)
-                  setTimeout(() => setEditingAccount(null), 200)
-                  loadAccounts()
-                }}
-              />
-            </DialogContent>
-          </Dialog>
+          {editingAccount && (
+            <Dialog
+              open={isEditOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  handleCloseEdit()
+                }
+              }}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Akun</DialogTitle>
+                </DialogHeader>
+                <AccountForm
+                  key={editingAccount.id}
+                  account={editingAccount}
+                  onSuccess={() => {
+                    handleCloseEdit()
+                    loadAccounts()
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
