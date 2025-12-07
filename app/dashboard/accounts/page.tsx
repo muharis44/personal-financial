@@ -160,7 +160,8 @@ export default function AccountsPage() {
           });
         }, 100);
       } else {
-        toast.error("Gagal menyimpan akun");
+        const data = await res.json();
+        toast.error(data.error || "Gagal menyimpan akun");
       }
     } catch (error) {
       console.error("Error saving account:", error);

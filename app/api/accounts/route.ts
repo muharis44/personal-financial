@@ -85,12 +85,17 @@ export async function POST(request: Request) {
     console.error("Error creating account:", error)
     let errorMessage = "Internal server error"
 
-    if (error instanceof Error) {
-      if (error.message.includes("Duplicate entry")) {
+    // Check if it's a MySQL duplicate entry error
+    if (error && typeof error === 'object') {
+      const mysqlError = error as { code?: string; sqlMessage?: string }
+      if (mysqlError.code === 'ER_DUP_ENTRY' ||
+          (mysqlError.sqlMessage && mysqlError.sqlMessage.includes('Duplicate entry'))) {
         errorMessage = "Nama akun sudah digunakan. Gunakan nama lain."
-      } else {
+      } else if (error instanceof Error) {
         errorMessage = error.message
       }
+    } else if (error instanceof Error) {
+      errorMessage = error.message
     }
 
     return NextResponse.json(
