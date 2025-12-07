@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { usePrivacy } from "@/contexts/privacy-context"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +34,7 @@ const COLORS = [
 
 export default function AccountsPage() {
   const { user } = useAuth()
+  const { maskAmount } = usePrivacy()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [totalBalance, setTotalBalance] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -283,7 +285,7 @@ export default function AccountsPage() {
           <div>
             <p className="text-sm text-muted-foreground">Total Saldo (IDR)</p>
             <h2 className="text-3xl font-bold">
-              Rp {totalBalance.toLocaleString('id-ID')}
+              {maskAmount(`Rp ${totalBalance.toLocaleString('id-ID')}`)}
             </h2>
           </div>
         </div>

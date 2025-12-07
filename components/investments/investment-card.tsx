@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { usePrivacy } from "@/contexts/privacy-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,7 @@ interface InvestmentCardProps {
 }
 
 export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
+  const { maskAmount } = usePrivacy()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const gainLoss = (Number(investment.currentPrice) - Number(investment.buyPrice)) * Number(investment.quantity)
   const gainLossPercentage = ((Number(investment.currentPrice) - Number(investment.buyPrice)) / Number(investment.buyPrice)) * 100
@@ -84,7 +86,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Nilai Sekarang</span>
           <span className="font-semibold">
-            {investment.currency} {currentValue.toLocaleString('id-ID')}
+            {maskAmount(`${investment.currency} ${currentValue.toLocaleString('id-ID')}`)}
           </span>
         </div>
 
@@ -92,7 +94,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
           <span className="text-sm text-muted-foreground">Gain/Loss</span>
           <div className="flex items-center gap-2">
             <span className={`font-semibold ${gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {gainLoss >= 0 ? '+' : ''}{investment.currency} {Math.abs(gainLoss).toLocaleString('id-ID')}
+              {maskAmount(`${gainLoss >= 0 ? '+' : ''}${investment.currency} ${Math.abs(gainLoss).toLocaleString('id-ID')}`)}
             </span>
             {gainLoss >= 0 ? (
               <TrendingUp className="h-4 w-4 text-green-600" />
@@ -112,7 +114,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
         <div className="pt-3 border-t grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-muted-foreground">Harga Beli</p>
-            <p className="font-medium">{investment.currency} {Number(investment.buyPrice).toLocaleString('id-ID')}</p>
+            <p className="font-medium">{maskAmount(`${investment.currency} ${Number(investment.buyPrice).toLocaleString('id-ID')}`)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Qty</p>

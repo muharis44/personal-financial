@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { usePrivacy } from "@/contexts/privacy-context";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ interface AccountCardProps {
 }
 
 export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProps) {
+  const { maskAmount } = usePrivacy();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = async () => {
@@ -88,7 +90,7 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
       <div className="mt-4">
         <p className="text-sm text-muted-foreground">Saldo</p>
         <p className="text-2xl font-bold">
-          {account.currency} {Number(account.balance).toLocaleString("id-ID")}
+          {maskAmount(`${account.currency} ${Number(account.balance).toLocaleString("id-ID")}`)}
         </p>
       </div>
 

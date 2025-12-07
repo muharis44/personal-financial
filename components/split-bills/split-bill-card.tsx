@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, X } from "lucide-react"
 import { toast } from "sonner"
+import { usePrivacy } from "@/contexts/privacy-context"
 import type { SplitBill, SplitBillParticipant } from "@/types"
 
 interface SplitBillWithParticipants extends SplitBill {
@@ -17,6 +18,7 @@ interface SplitBillCardProps {
 }
 
 export function SplitBillCard({ bill, onUpdate }: SplitBillCardProps) {
+  const { maskAmount } = usePrivacy()
   const paidCount = bill.participants.filter(p => p.isPaid).length
   const totalCount = bill.participants.length
 
@@ -46,7 +48,7 @@ export function SplitBillCard({ bill, onUpdate }: SplitBillCardProps) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="font-semibold text-lg mb-1">{bill.title}</h3>
-          <p className="text-2xl font-bold">Rp {Number(bill.totalAmount).toLocaleString('id-ID')}</p>
+          <p className="text-2xl font-bold">{maskAmount(`Rp ${Number(bill.totalAmount).toLocaleString('id-ID')}`)}</p>
         </div>
         <Badge variant={paidCount === totalCount ? "default" : "secondary"}>
           {paidCount}/{totalCount} Lunas
@@ -62,7 +64,7 @@ export function SplitBillCard({ bill, onUpdate }: SplitBillCardProps) {
             <div className="flex-1">
               <p className="font-medium">{participant.name}</p>
               <p className="text-sm text-muted-foreground">
-                Rp {Number(participant.amount).toLocaleString('id-ID')}
+                {maskAmount(`Rp ${Number(participant.amount).toLocaleString('id-ID')}`)}
               </p>
             </div>
             {participant.isPaid ? (
