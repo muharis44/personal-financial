@@ -86,18 +86,20 @@ export default function AccountsPage() {
   }
 
   const handleOpenChange = (open: boolean) => {
-    setIsFormOpen(open)
     if (!open) {
-      setEditingAccount(null)
-      setFormData({
-        name: "",
-        type: "cash",
-        balance: "0",
-        currency: "IDR",
-        color: "#10b981",
-        icon: "Wallet",
-      })
+      setTimeout(() => {
+        setEditingAccount(null)
+        setFormData({
+          name: "",
+          type: "cash",
+          balance: "0",
+          currency: "IDR",
+          color: "#10b981",
+          icon: "Wallet",
+        })
+      }, 100)
     }
+    setIsFormOpen(open)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,17 +123,19 @@ export default function AccountsPage() {
 
       if (res.ok) {
         toast.success(editingAccount ? "Akun berhasil diupdate" : "Akun berhasil ditambahkan")
-        setIsFormOpen(false)
-        setEditingAccount(null)
-        setFormData({
-          name: "",
-          type: "cash",
-          balance: "0",
-          currency: "IDR",
-          color: "#10b981",
-          icon: "Wallet",
-        })
         loadAccounts()
+        setIsFormOpen(false)
+        setTimeout(() => {
+          setEditingAccount(null)
+          setFormData({
+            name: "",
+            type: "cash",
+            balance: "0",
+            currency: "IDR",
+            color: "#10b981",
+            icon: "Wallet",
+          })
+        }, 100)
       } else {
         toast.error("Gagal menyimpan akun")
       }
