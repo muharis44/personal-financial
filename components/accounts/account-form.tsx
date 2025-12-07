@@ -132,7 +132,7 @@ export function AccountForm({ account, onSuccess }: AccountFormProps) {
           onValueChange={(value) => setFormData({ ...formData, type: value })}
         >
           <SelectTrigger>
-            <SelectValue />
+            <SelectValue placeholder="Pilih tipe akun" />
           </SelectTrigger>
           <SelectContent>
             {ACCOUNT_TYPES.map((type) => (

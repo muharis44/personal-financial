@@ -54,8 +54,16 @@ export default function AccountsPage() {
     setIsAddOpen(false)
   }
 
+  const handleAddOpen = (open: boolean) => {
+    setIsAddOpen(open)
+  }
+
   const handleCloseTransfer = () => {
     setIsTransferOpen(false)
+  }
+
+  const handleTransferOpen = (open: boolean) => {
+    setIsTransferOpen(open)
   }
 
   const getAccountIcon = (type: string) => {
@@ -75,9 +83,9 @@ export default function AccountsPage() {
           <p className="text-muted-foreground">Kelola rekening bank, e-wallet, dan uang cash</p>
         </div>
         <div className="flex gap-2">
-          <Dialog open={isTransferOpen} onOpenChange={handleCloseTransfer}>
+          <Dialog open={isTransferOpen} onOpenChange={handleTransferOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" onClick={() => setIsTransferOpen(true)}>
+              <Button variant="outline">
                 <ArrowLeftRight className="h-4 w-4 mr-2" />
                 Transfer
               </Button>
@@ -96,9 +104,9 @@ export default function AccountsPage() {
               />
             </DialogContent>
           </Dialog>
-          <Dialog open={isAddOpen} onOpenChange={handleCloseAdd}>
+          <Dialog open={isAddOpen} onOpenChange={handleAddOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setIsAddOpen(true)}>
+              <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Tambah Akun
               </Button>
