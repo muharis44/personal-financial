@@ -3,13 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Edit, Trash } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Edit, Trash } from "lucide-react";
 import type { Account } from "@/types";
 
 interface AccountCardProps {
@@ -55,26 +49,14 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
         >
           {icon}
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(account)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={handleDelete}
-              className="text-destructive"
-            >
-              <Trash className="h-4 w-4 mr-2" />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => onEdit(account)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDelete}>
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <h3 className="font-semibold text-lg mb-2">{account.name}</h3>
