@@ -17,12 +17,17 @@ interface TransactionFormProps {
   transaction?: Transaction
   onClose?: () => void
   trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function TransactionForm({ transaction, onClose, trigger }: TransactionFormProps) {
+export function TransactionForm({ transaction, onClose, trigger, open: controlledOpen, onOpenChange }: TransactionFormProps) {
   const { categories, addTransaction, updateTransaction } = useFinance()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
 
   const [formData, setFormData] = useState({
     type: transaction?.type || ("expense" as "income" | "expense"),
