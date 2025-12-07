@@ -1,25 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useAuth } from "@/contexts/auth-context"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Wallet, CreditCard, Smartphone, Banknote, ArrowLeftRight } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AccountCard } from "@/components/accounts/account-card"
-import { AccountTransferDialog } from "@/components/accounts/account-transfer-dialog"
-import { toast } from "sonner"
-import type { Account } from "@/types"
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Plus,
+  Wallet,
+  CreditCard,
+  Smartphone,
+  Banknote,
+  ArrowLeftRight,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { AccountCard } from "@/components/accounts/account-card";
+import { AccountTransferDialog } from "@/components/accounts/account-transfer-dialog";
+import { toast } from "sonner";
+import type { Account } from "@/types";
 
 const ACCOUNT_TYPES = [
   { value: "cash", label: "Uang Tunai" },
   { value: "bank", label: "Rekening Bank" },
   { value: "e-wallet", label: "E-Wallet" },
   { value: "credit-card", label: "Kartu Kredit" },
-]
+];
 
 const COLORS = [
   "#10b981",
@@ -28,17 +47,17 @@ const COLORS = [
   "#f59e0b",
   "#ef4444",
   "#ec4899",
-]
+];
 
 export default function AccountsPage() {
-  const { user } = useAuth()
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [totalBalance, setTotalBalance] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
-  const [isTransferOpen, setIsTransferOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const { user } = useAuth();
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "cash",
@@ -46,26 +65,26 @@ export default function AccountsPage() {
     currency: "IDR",
     color: "#10b981",
     icon: "Wallet",
-  })
+  });
 
   const loadAccounts = async () => {
-    if (!user) return
+    if (!user) return;
 
     try {
-      const res = await fetch(`/api/accounts?userId=${user.id}`)
-      const data = await res.json()
-      setAccounts(data.accounts || [])
-      setTotalBalance(data.totalBalance || 0)
+      const res = await fetch(`/api/accounts?userId=${user.id}`);
+      const data = await res.json();
+      setAccounts(data.accounts || []);
+      setTotalBalance(data.totalBalance || 0);
     } catch (error) {
-      console.error("Error loading accounts:", error)
+      console.error("Error loading accounts:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadAccounts()
-  }, [user])
+    loadAccounts();
+  }, [user]);
 
   useEffect(() => {
     if (editingAccount) {
@@ -76,40 +95,40 @@ export default function AccountsPage() {
         currency: editingAccount.currency,
         color: editingAccount.color,
         icon: editingAccount.icon,
-      })
-      setIsFormOpen(true)
+      });
+      setIsFormOpen(true);
     }
-  }, [editingAccount])
+  }, [editingAccount]);
 
   const handleEdit = (account: Account) => {
-    setEditingAccount(account)
-  }
+    setEditingAccount(account);
+  };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setTimeout(() => {
-        setEditingAccount(null)
-        setFormData({
-          name: "",
-          type: "cash",
-          balance: "0",
-          currency: "IDR",
-          color: "#10b981",
-          icon: "Wallet",
-        })
-      }, 100)
+      setEditingAccount(null);
+      setFormData({
+        name: "",
+        type: "cash",
+        balance: "0",
+        currency: "IDR",
+        color: "#10b981",
+        icon: "Wallet",
+      });
     }
-    setIsFormOpen(open)
-  }
+    setIsFormOpen(open);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
 
-    setIsSaving(true)
+    setIsSaving(true);
     try {
-      const url = editingAccount ? `/api/accounts/${editingAccount.id}` : "/api/accounts"
-      const method = editingAccount ? "PUT" : "POST"
+      const url = editingAccount
+        ? `/api/accounts/${editingAccount.id}`
+        : "/api/accounts";
+      const method = editingAccount ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
@@ -119,14 +138,18 @@ export default function AccountsPage() {
           ...formData,
           balance: parseFloat(formData.balance) || 0,
         }),
-      })
+      });
 
       if (res.ok) {
-        toast.success(editingAccount ? "Akun berhasil diupdate" : "Akun berhasil ditambahkan")
-        loadAccounts()
-        setIsFormOpen(false)
+        toast.success(
+          editingAccount
+            ? "Akun berhasil diupdate"
+            : "Akun berhasil ditambahkan"
+        );
+        loadAccounts();
+        setIsFormOpen(false);
         setTimeout(() => {
-          setEditingAccount(null)
+          setEditingAccount(null);
           setFormData({
             name: "",
             type: "cash",
@@ -134,38 +157,44 @@ export default function AccountsPage() {
             currency: "IDR",
             color: "#10b981",
             icon: "Wallet",
-          })
-        }, 100)
+          });
+        }, 100);
       } else {
-        toast.error("Gagal menyimpan akun")
+        toast.error("Gagal menyimpan akun");
       }
     } catch (error) {
-      console.error("Error saving account:", error)
-      toast.error("Terjadi kesalahan")
+      console.error("Error saving account:", error);
+      toast.error("Terjadi kesalahan");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleTransferOpen = (open: boolean) => {
-    setIsTransferOpen(open)
-  }
+    setIsTransferOpen(open);
+  };
 
   const getAccountIcon = (type: string) => {
     switch (type) {
-      case 'bank': return <CreditCard className="h-5 w-5" />
-      case 'e-wallet': return <Smartphone className="h-5 w-5" />
-      case 'credit-card': return <CreditCard className="h-5 w-5" />
-      default: return <Wallet className="h-5 w-5" />
+      case "bank":
+        return <CreditCard className="h-5 w-5" />;
+      case "e-wallet":
+        return <Smartphone className="h-5 w-5" />;
+      case "credit-card":
+        return <CreditCard className="h-5 w-5" />;
+      default:
+        return <Wallet className="h-5 w-5" />;
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Akun & Dompet</h1>
-          <p className="text-muted-foreground">Kelola rekening bank, e-wallet, dan uang cash</p>
+          <p className="text-muted-foreground">
+            Kelola rekening bank, e-wallet, dan uang cash
+          </p>
         </div>
         <div className="flex gap-2">
           <Dialog open={isTransferOpen} onOpenChange={handleTransferOpen}>
@@ -183,8 +212,8 @@ export default function AccountsPage() {
                 key={isTransferOpen ? "open" : "closed"}
                 accounts={accounts}
                 onSuccess={() => {
-                  setIsTransferOpen(false)
-                  loadAccounts()
+                  setIsTransferOpen(false);
+                  loadAccounts();
                 }}
               />
             </DialogContent>
@@ -198,7 +227,9 @@ export default function AccountsPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{editingAccount ? "Edit Akun" : "Tambah Akun Baru"}</DialogTitle>
+                <DialogTitle>
+                  {editingAccount ? "Edit Akun" : "Tambah Akun Baru"}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -207,7 +238,9 @@ export default function AccountsPage() {
                     id="name"
                     placeholder="Contoh: BCA, GoPay, Cash"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -216,7 +249,9 @@ export default function AccountsPage() {
                   <Label htmlFor="type">Tipe Akun</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) => setFormData({ ...formData, type: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, type: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih tipe akun" />
@@ -265,7 +300,11 @@ export default function AccountsPage() {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isSaving}>
-                  {isSaving ? "Menyimpan..." : editingAccount ? "Update Akun" : "Simpan Akun"}
+                  {isSaving
+                    ? "Menyimpan..."
+                    : editingAccount
+                    ? "Update Akun"
+                    : "Simpan Akun"}
                 </Button>
               </form>
             </DialogContent>
@@ -281,14 +320,16 @@ export default function AccountsPage() {
           <div>
             <p className="text-sm text-muted-foreground">Total Saldo (IDR)</p>
             <h2 className="text-3xl font-bold">
-              Rp {totalBalance.toLocaleString('id-ID')}
+              Rp {totalBalance.toLocaleString("id-ID")}
             </h2>
           </div>
         </div>
       </Card>
 
       {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+        <div className="text-center py-12 text-muted-foreground">
+          Loading...
+        </div>
       ) : accounts.length === 0 ? (
         <Card className="p-12 text-center">
           <Wallet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -315,5 +356,5 @@ export default function AccountsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
