@@ -3,8 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, MoreVertical, Edit, Trash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { TrendingUp, TrendingDown, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Investment } from "@/types"
 
@@ -17,6 +16,10 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
   const gainLoss = (Number(investment.currentPrice) - Number(investment.buyPrice)) * Number(investment.quantity)
   const gainLossPercentage = ((Number(investment.currentPrice) - Number(investment.buyPrice)) / Number(investment.buyPrice)) * 100
   const currentValue = Number(investment.currentPrice) * Number(investment.quantity)
+
+  const handleEdit = () => {
+    toast.info("Fitur update harga akan segera tersedia")
+  }
 
   const handleDelete = async () => {
     if (!confirm(`Hapus investasi ${investment.name}?`)) return
@@ -51,23 +54,19 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
           </div>
           <Badge>{investment.type}</Badge>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Edit className="h-4 w-4 mr-2" />
-              Update Harga
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-              <Trash className="h-4 w-4 mr-2" />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleEdit}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={handleDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">
