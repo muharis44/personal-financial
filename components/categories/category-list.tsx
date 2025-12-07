@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,12 +17,13 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useFinance } from "@/contexts/finance-context"
 import { CategoryForm } from "./category-form"
-import { MoreVertical, Edit, Trash2, TrendingUp, TrendingDown, Tags } from "lucide-react"
+import { Edit, Trash2, TrendingUp, TrendingDown, Tags } from "lucide-react"
 import type { Category } from "@/types"
 
 export function CategoryList() {
   const { categories, transactions, deleteCategory } = useFinance()
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
 
   const incomeCategories = categories.filter((c) => c.type === "income")
@@ -69,23 +69,25 @@ export function CategoryList() {
           >
             {category.type === "income" ? "Pemasukan" : "Pengeluaran"}
           </Badge>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setEditingCategory(category)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive" onClick={() => setDeletingCategory(category)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Hapus
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => {
+              setEditingCategory(category);
+              setIsEditOpen(true);
+            }}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={() => setDeletingCategory(category)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     )
@@ -152,8 +154,17 @@ export function CategoryList() {
       {editingCategory && (
         <CategoryForm
           category={editingCategory}
-          onClose={() => setEditingCategory(null)}
-          trigger={<span className="hidden" />}
+          open={isEditOpen}
+          onOpenChange={(open) => {
+            setIsEditOpen(open);
+            if (!open) {
+              setEditingCategory(null);
+            }
+          }}
+          onClose={() => {
+            setEditingCategory(null);
+            setIsEditOpen(false);
+          }}
         />
       )}
 

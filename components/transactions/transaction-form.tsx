@@ -25,6 +25,10 @@ export function TransactionForm({ transaction, onClose, trigger, open: controlle
   const { categories, addTransaction, updateTransaction } = useFinance()
   const [internalOpen, setInternalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState({
+    amount: "",
+    categoryId: "",
+  })
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = onOpenChange || setInternalOpen
@@ -51,8 +55,56 @@ export function TransactionForm({ transaction, onClose, trigger, open: controlle
 
   const filteredCategories = categories.filter((c) => c.type === formData.type)
 
+  const validateAmount = (value: string) => {
+    const num = parseFloat(value)
+    if (!value || value.trim() === "") {
+      return "Jumlah harus diisi"
+    }
+    if (isNaN(num)) {
+      return "Jumlah harus berupa angka"
+    }
+    if (num <= 0) {
+      return "Jumlah harus lebih dari 0"
+    }
+    if (num > 1000000000) {
+      return "Jumlah terlalu besar"
+    }
+    return ""
+  }
+
+  const validateCategory = (value: string) => {
+    if (!value || value.trim() === "") {
+      return "Kategori harus dipilih"
+    }
+    return ""
+  }
+
+  const handleAmountChange = (value: string) => {
+    setFormData({ ...formData, amount: value })
+    const error = validateAmount(value)
+    setErrors({ ...errors, amount: error })
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setFormData({ ...formData, categoryId: value })
+    const error = validateCategory(value)
+    setErrors({ ...errors, categoryId: error })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const amountError = validateAmount(formData.amount)
+    const categoryError = validateCategory(formData.categoryId)
+
+    if (amountError || categoryError) {
+      setErrors({
+        amount: amountError,
+        categoryId: categoryError,
+      })
+      return
+    }
+
     setIsLoading(true)
 
     const data = {
@@ -122,9 +174,9 @@ export function TransactionForm({ transaction, onClose, trigger, open: controlle
             <Label htmlFor="category">Kategori</Label>
             <Select
               value={formData.categoryId}
-              onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
+              onValueChange={handleCategoryChange}
             >
-              <SelectTrigger>
+              <SelectTrigger className={errors.categoryId ? "border-destructive" : ""}>
                 <SelectValue placeholder="Pilih kategori" />
               </SelectTrigger>
               <SelectContent>
@@ -138,6 +190,9 @@ export function TransactionForm({ transaction, onClose, trigger, open: controlle
                 ))}
               </SelectContent>
             </Select>
+            {errors.categoryId && (
+              <p className="text-xs text-destructive">{errors.categoryId}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -145,12 +200,17 @@ export function TransactionForm({ transaction, onClose, trigger, open: controlle
             <Input
               id="amount"
               type="number"
+              className={errors.amount ? "border-destructive" : ""}
               placeholder="Masukkan nominal"
               value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              onChange={(e) => handleAmountChange(e.target.value)}
               min="0"
+              step="0.01"
               required
             />
+            {errors.amount && (
+              <p className="text-xs text-destructive">{errors.amount}</p>
+            )}
           </div>
 
           <div className="space-y-2">

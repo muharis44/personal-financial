@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -189,15 +190,15 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Akun & Dompet</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Akun & Dompet</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Kelola rekening bank, e-wallet, dan uang cash
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Dialog open={isTransferOpen} onOpenChange={handleTransferOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
@@ -328,8 +329,24 @@ export default function AccountsPage() {
       </Card>
 
       {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Loading...
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <Skeleton className="h-12 w-12 rounded-lg" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+              <Skeleton className="h-6 w-32 mb-2" />
+              <Skeleton className="h-5 w-24 mb-3" />
+              <div className="mt-4">
+                <Skeleton className="h-3 w-16 mb-2" />
+                <Skeleton className="h-8 w-40" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : accounts.length === 0 ? (
         <Card className="p-12 text-center">

@@ -1,8 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Edit, Trash } from "lucide-react";
 import { toast } from "sonner";
 import type { Account } from "@/types";
@@ -15,9 +26,9 @@ interface AccountCardProps {
 }
 
 export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProps) {
-  const handleDelete = async () => {
-    if (!confirm(`Hapus akun ${account.name}?`)) return;
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const handleDelete = async () => {
     try {
       const res = await fetch(`/api/accounts/${account.id}`, {
         method: "DELETE",
@@ -34,6 +45,7 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
       console.error("Error deleting account:", error);
       toast.error("Terjadi kesalahan saat menghapus akun");
     }
+    setShowDeleteDialog(false);
   };
 
   const getTypeLabel = (type: string) => {
@@ -62,7 +74,7 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
           <Button variant="outline" size="sm" onClick={() => onEdit(account)}>
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDelete}>
+          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)}>
             <Trash className="h-4 w-4" />
           </Button>
         </div>
@@ -79,6 +91,23 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
           {account.currency} {Number(account.balance).toLocaleString("id-ID")}
         </p>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Akun</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus akun <span className="font-semibold">{account.name}</span>? Semua transaksi terkait akun ini akan terpengaruh.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

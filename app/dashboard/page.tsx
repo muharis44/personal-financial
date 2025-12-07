@@ -6,6 +6,7 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions"
 import { BudgetAlert } from "@/components/dashboard/budget-alert"
 import { NetWorthCard } from "@/components/dashboard/net-worth-card"
 import { TransactionForm } from "@/components/transactions/transaction-form"
+import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useFinance } from "@/contexts/finance-context"
 import { usePrivacy } from "@/contexts/privacy-context"
@@ -17,7 +18,7 @@ import Link from "next/link"
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const { debts, savingsGoals, recurringTransactions } = useFinance()
+  const { debts, savingsGoals, recurringTransactions, isLoading } = useFinance()
   const { maskAmount } = usePrivacy()
   const month = getCurrentMonth()
   const year = getCurrentYear()
@@ -43,10 +44,14 @@ export default function DashboardPage() {
     .filter((r) => r.type === "expense")
     .reduce((sum, r) => sum + r.amount, 0)
 
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold md:text-3xl">Selamat datang, {user?.name}!</h1>
           <p className="text-muted-foreground">

@@ -54,12 +54,17 @@ interface CategoryFormProps {
   category?: Category
   onClose?: () => void
   trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function CategoryForm({ category, onClose, trigger }: CategoryFormProps) {
+export function CategoryForm({ category, onClose, trigger, open: controlledOpen, onOpenChange }: CategoryFormProps) {
   const { addCategory, updateCategory } = useFinance()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
 
   const [formData, setFormData] = useState({
     name: category?.name || "",
@@ -79,11 +84,6 @@ export function CategoryForm({ category, onClose, trigger }: CategoryFormProps) 
     }
   }, [category])
 
-  useEffect(() => {
-    if (category && !open) {
-      setOpen(true)
-    }
-  }, [category, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -107,13 +107,7 @@ export function CategoryForm({ category, onClose, trigger }: CategoryFormProps) 
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(newOpen) => {
-        setOpen(newOpen)
-        if (!newOpen) onClose?.()
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
           <Button>

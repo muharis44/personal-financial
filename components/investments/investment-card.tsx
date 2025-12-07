@@ -1,10 +1,20 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, MoreVertical, Edit, Trash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { TrendingUp, TrendingDown, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Investment } from "@/types"
 
@@ -14,13 +24,16 @@ interface InvestmentCardProps {
 }
 
 export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const gainLoss = (Number(investment.currentPrice) - Number(investment.buyPrice)) * Number(investment.quantity)
   const gainLossPercentage = ((Number(investment.currentPrice) - Number(investment.buyPrice)) / Number(investment.buyPrice)) * 100
   const currentValue = Number(investment.currentPrice) * Number(investment.quantity)
 
-  const handleDelete = async () => {
-    if (!confirm(`Hapus investasi ${investment.name}?`)) return
+  const handleEdit = () => {
+    toast.info("Fitur update harga akan segera tersedia")
+  }
 
+  const handleDelete = async () => {
     try {
       const res = await fetch(`/api/investments/${investment.id}`, {
         method: "DELETE"
@@ -37,6 +50,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
       console.error("Error deleting investment:", error)
       toast.error("Terjadi kesalahan saat menghapus investasi")
     }
+    setShowDeleteDialog(false)
   }
 
   return (
@@ -51,23 +65,19 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
           </div>
           <Badge>{investment.type}</Badge>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Edit className="h-4 w-4 mr-2" />
-              Update Harga
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-              <Trash className="h-4 w-4 mr-2" />
-              Hapus
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleEdit}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -110,6 +120,23 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Investasi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus investasi <span className="font-semibold">{investment.name}</span>? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }

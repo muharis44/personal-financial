@@ -1,8 +1,19 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Check, Clock, Trash } from "lucide-react"
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
@@ -15,6 +26,7 @@ interface ReminderCardProps {
 }
 
 export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const dueDate = new Date(reminder.dueDate)
   const reminderDate = new Date(reminder.reminderDate)
   const today = new Date()
@@ -43,8 +55,6 @@ export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
   }
 
   const handleDelete = async () => {
-    if (!confirm("Hapus reminder ini?")) return
-
     try {
       const res = await fetch(`/api/reminders/${reminder.id}`, {
         method: "DELETE"
@@ -61,6 +71,7 @@ export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
       console.error("Error deleting reminder:", error)
       toast.error("Terjadi kesalahan saat menghapus reminder")
     }
+    setShowDeleteDialog(false)
   }
 
   return (
@@ -96,11 +107,28 @@ export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
               Selesai
             </Button>
           )}
-          <Button size="sm" variant="ghost" onClick={handleDelete}>
+          <Button size="sm" variant="ghost" onClick={() => setShowDeleteDialog(true)}>
             <Trash className="h-4 w-4" />
           </Button>
         </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Reminder</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus reminder <span className="font-semibold">{reminder.title}</span>? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }
