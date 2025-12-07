@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, X } from "lucide-react"
+import { toast } from "sonner"
 import type { SplitBill, SplitBillParticipant } from "@/types"
 
 interface SplitBillWithParticipants extends SplitBill {
@@ -21,14 +22,22 @@ export function SplitBillCard({ bill, onUpdate }: SplitBillCardProps) {
 
   const handleMarkPaid = async (participantId: string) => {
     try {
-      await fetch(`/api/split-bills/${bill.id}/pay`, {
+      const res = await fetch(`/api/split-bills/${bill.id}/pay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ participantId })
       })
-      onUpdate()
+
+      if (res.ok) {
+        toast.success("Peserta ditandai lunas")
+        onUpdate()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menandai sebagai lunas")
+      }
     } catch (error) {
       console.error("Error marking as paid:", error)
+      toast.error("Terjadi kesalahan")
     }
   }
 

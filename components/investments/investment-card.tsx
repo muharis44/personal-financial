@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, TrendingDown, MoreVertical, Edit, Trash } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 import type { Investment } from "@/types"
 
 interface InvestmentCardProps {
@@ -21,12 +22,20 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
     if (!confirm(`Hapus investasi ${investment.name}?`)) return
 
     try {
-      await fetch(`/api/investments/${investment.id}`, {
+      const res = await fetch(`/api/investments/${investment.id}`, {
         method: "DELETE"
       })
-      onUpdate()
+
+      if (res.ok) {
+        toast.success("Investasi berhasil dihapus")
+        onUpdate()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menghapus investasi")
+      }
     } catch (error) {
       console.error("Error deleting investment:", error)
+      toast.error("Terjadi kesalahan saat menghapus investasi")
     }
   }
 

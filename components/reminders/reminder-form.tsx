@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 
 interface ReminderFormProps {
   onSuccess: () => void
@@ -49,10 +50,15 @@ export function ReminderForm({ onSuccess }: ReminderFormProps) {
       })
 
       if (res.ok) {
+        toast.success("Reminder berhasil ditambahkan")
         onSuccess()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menambahkan reminder")
       }
     } catch (error) {
       console.error("Error creating reminder:", error)
+      toast.error("Terjadi kesalahan saat menambahkan reminder")
     } finally {
       setIsLoading(false)
     }

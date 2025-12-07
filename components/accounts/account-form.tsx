@@ -102,7 +102,8 @@ export function AccountForm({ account, onSuccess }: AccountFormProps) {
         onSuccess();
         toast.success(account ? "Akun berhasil diupdate" : "Akun berhasil ditambahkan");
       } else {
-        toast.error("Gagal menyimpan akun");
+        const data = await res.json();
+        toast.error(data.error || "Gagal menyimpan akun");
       }
     } catch (error) {
       console.error("Error saving account:", error);

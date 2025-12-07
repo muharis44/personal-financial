@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
+import { toast } from "sonner";
 import type { Account } from "@/types";
 
 interface AccountCardProps {
@@ -18,12 +19,20 @@ export function AccountCard({ account, icon, onUpdate, onEdit }: AccountCardProp
     if (!confirm(`Hapus akun ${account.name}?`)) return;
 
     try {
-      await fetch(`/api/accounts/${account.id}`, {
+      const res = await fetch(`/api/accounts/${account.id}`, {
         method: "DELETE",
       });
-      onUpdate();
+
+      if (res.ok) {
+        toast.success("Akun berhasil dihapus");
+        onUpdate();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Gagal menghapus akun");
+      }
     } catch (error) {
       console.error("Error deleting account:", error);
+      toast.error("Terjadi kesalahan saat menghapus akun");
     }
   };
 

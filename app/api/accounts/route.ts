@@ -83,8 +83,18 @@ export async function POST(request: Request) {
     return NextResponse.json(account, { status: 201 })
   } catch (error: unknown) {
     console.error("Error creating account:", error)
+    let errorMessage = "Internal server error"
+
+    if (error instanceof Error) {
+      if (error.message.includes("Duplicate entry")) {
+        errorMessage = "Nama akun sudah digunakan. Gunakan nama lain."
+      } else {
+        errorMessage = error.message
+      }
+    }
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
+      { error: errorMessage },
       { status: 500 }
     )
   }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, X } from "lucide-react"
+import { toast } from "sonner"
 
 interface SplitBillFormProps {
   onSuccess: () => void
@@ -51,7 +52,7 @@ export function SplitBillForm({ onSuccess }: SplitBillFormProps) {
 
     const validParticipants = participants.filter(p => p.name && p.amount)
     if (validParticipants.length === 0) {
-      alert("Tambahkan minimal 1 participant")
+      toast.error("Tambahkan minimal 1 peserta")
       return
     }
 
@@ -72,10 +73,15 @@ export function SplitBillForm({ onSuccess }: SplitBillFormProps) {
       })
 
       if (res.ok) {
+        toast.success("Patungan berhasil dibuat")
         onSuccess()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal membuat patungan")
       }
     } catch (error) {
       console.error("Error creating split bill:", error)
+      toast.error("Terjadi kesalahan saat membuat patungan")
     } finally {
       setIsLoading(false)
     }

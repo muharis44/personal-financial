@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 
 interface InvestmentFormProps {
   onSuccess: () => void
@@ -55,10 +56,15 @@ export function InvestmentForm({ onSuccess }: InvestmentFormProps) {
       })
 
       if (res.ok) {
+        toast.success("Investasi berhasil ditambahkan")
         onSuccess()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menambahkan investasi")
       }
     } catch (error) {
       console.error("Error creating investment:", error)
+      toast.error("Terjadi kesalahan saat menambahkan investasi")
     } finally {
       setIsLoading(false)
     }

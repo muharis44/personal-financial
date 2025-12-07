@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 import type { Account } from "@/types"
 
 interface AccountTransferDialogProps {
@@ -30,7 +31,7 @@ export function AccountTransferDialog({ accounts, onSuccess }: AccountTransferDi
     if (!user) return
 
     if (formData.fromAccountId === formData.toAccountId) {
-      alert("Tidak bisa transfer ke akun yang sama")
+      toast.error("Tidak bisa transfer ke akun yang sama")
       return
     }
 
@@ -47,10 +48,15 @@ export function AccountTransferDialog({ accounts, onSuccess }: AccountTransferDi
       })
 
       if (res.ok) {
+        toast.success("Transfer berhasil")
         onSuccess()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal melakukan transfer")
       }
     } catch (error) {
       console.error("Error creating transfer:", error)
+      toast.error("Terjadi kesalahan saat melakukan transfer")
     } finally {
       setIsLoading(false)
     }

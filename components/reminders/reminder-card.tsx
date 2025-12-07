@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Check, Clock, Trash } from "lucide-react"
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
+import { toast } from "sonner"
 import type { Reminder } from "@/types"
 
 interface ReminderCardProps {
@@ -22,14 +23,22 @@ export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
 
   const handleComplete = async () => {
     try {
-      await fetch(`/api/reminders/${reminder.id}`, {
+      const res = await fetch(`/api/reminders/${reminder.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isCompleted: true })
       })
-      onUpdate()
+
+      if (res.ok) {
+        toast.success("Reminder ditandai selesai")
+        onUpdate()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menandai reminder selesai")
+      }
     } catch (error) {
       console.error("Error completing reminder:", error)
+      toast.error("Terjadi kesalahan")
     }
   }
 
@@ -37,12 +46,20 @@ export function ReminderCard({ reminder, onUpdate }: ReminderCardProps) {
     if (!confirm("Hapus reminder ini?")) return
 
     try {
-      await fetch(`/api/reminders/${reminder.id}`, {
+      const res = await fetch(`/api/reminders/${reminder.id}`, {
         method: "DELETE"
       })
-      onUpdate()
+
+      if (res.ok) {
+        toast.success("Reminder berhasil dihapus")
+        onUpdate()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Gagal menghapus reminder")
+      }
     } catch (error) {
       console.error("Error deleting reminder:", error)
+      toast.error("Terjadi kesalahan saat menghapus reminder")
     }
   }
 
