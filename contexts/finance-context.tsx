@@ -96,6 +96,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         fetch("/api/recurring-transactions", { headers: getHeaders() }),
       ]);
 
+      if (!catRes.ok || !txnRes.ok || !budgetRes.ok || !debtRes.ok || !savingsRes.ok || !recurringRes.ok) {
+        throw new Error("Gagal memuat beberapa data");
+      }
+
       const [catData, txnData, budgetData, debtData, savingsData, recurringData] = await Promise.all([
         catRes.json(),
         txnRes.json(),
@@ -113,7 +117,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(recurringData)) setRecurringTransactions(recurringData);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Gagal memuat data. Silakan coba lagi.");
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        toast.error("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
+      } else {
+        toast.error("Gagal memuat data keuangan. Silakan refresh halaman.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -219,11 +227,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           setTransactions((prev) => [data.transaction, ...prev]);
           toast.success("Transaksi berhasil ditambahkan");
         } else {
-          toast.error(data.error || "Gagal menambahkan transaksi");
+          toast.error(data.error || "Gagal menambahkan transaksi. Periksa data yang dimasukkan.");
         }
       } catch (error) {
         console.error("Error adding transaction:", error);
-        toast.error("Gagal menambahkan transaksi. Silakan coba lagi.");
+        toast.error("Tidak dapat menyimpan transaksi. Periksa koneksi internet Anda.");
       }
     },
     [user, getHeaders]

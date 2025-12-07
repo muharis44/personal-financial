@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -42,7 +43,7 @@ import {
 import type { Transaction } from "@/types";
 
 export function TransactionList() {
-  const { transactions, categories, deleteTransaction } = useFinance();
+  const { transactions, categories, deleteTransaction, isLoading } = useFinance();
   const { maskAmount } = usePrivacy();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
@@ -180,7 +181,26 @@ export function TransactionList() {
         </CardHeader>
 
         <CardContent>
-          {filteredTransactions.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center justify-between gap-3 rounded-lg border p-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-48" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredTransactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="rounded-full bg-muted p-4 mb-4">
                 <ArrowDownRight className="h-8 w-8 text-muted-foreground" />
