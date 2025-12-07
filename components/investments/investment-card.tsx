@@ -1,8 +1,19 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { TrendingUp, TrendingDown, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Investment } from "@/types"
@@ -13,6 +24,7 @@ interface InvestmentCardProps {
 }
 
 export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const gainLoss = (Number(investment.currentPrice) - Number(investment.buyPrice)) * Number(investment.quantity)
   const gainLossPercentage = ((Number(investment.currentPrice) - Number(investment.buyPrice)) / Number(investment.buyPrice)) * 100
   const currentValue = Number(investment.currentPrice) * Number(investment.quantity)
@@ -22,8 +34,6 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus investasi ${investment.name}?`)) return
-
     try {
       const res = await fetch(`/api/investments/${investment.id}`, {
         method: "DELETE"
@@ -40,6 +50,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
       console.error("Error deleting investment:", error)
       toast.error("Terjadi kesalahan saat menghapus investasi")
     }
+    setShowDeleteDialog(false)
   }
 
   return (
@@ -62,7 +73,7 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteDialog(true)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -109,6 +120,23 @@ export function InvestmentCard({ investment, onUpdate }: InvestmentCardProps) {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Investasi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus investasi <span className="font-semibold">{investment.name}</span>? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }
