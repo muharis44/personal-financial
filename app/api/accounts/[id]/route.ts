@@ -39,13 +39,20 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { name, type, balance, currency, color, icon, isActive } = body
+    const { name, type, balance, currency, color, icon, isActive = true } = body
+
+    if (!name || !type || balance === undefined) {
+      return NextResponse.json(
+        { error: "Name, type, and balance are required" },
+        { status: 400 }
+      )
+    }
 
     await query(
       `UPDATE accounts
        SET name = ?, type = ?, balance = ?, currency = ?, color = ?, icon = ?, is_active = ?
        WHERE id = ?`,
-      [name, type, balance, currency, color, icon, isActive, id]
+      [name, type, balance, currency || 'IDR', color || '#10b981', icon || 'Wallet', isActive, id]
     )
 
     const [account] = await query<Account[]>(
