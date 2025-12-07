@@ -67,6 +67,15 @@ export function AccountForm({ account, onSuccess }: AccountFormProps) {
         color: account.color,
         icon: account.icon,
       });
+    } else {
+      setFormData({
+        name: "",
+        type: "cash",
+        balance: "0",
+        currency: "IDR",
+        color: "#10b981",
+        icon: "Wallet",
+      });
     }
   }, [account]);
 

@@ -101,16 +101,25 @@ export default function AccountsPage() {
               />
             </DialogContent>
           </Dialog>
-          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <Dialog
+            open={isEditOpen}
+            onOpenChange={(open) => {
+              setIsEditOpen(open)
+              if (!open) {
+                setTimeout(() => setEditingAccount(null), 200)
+              }
+            }}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Edit Akun</DialogTitle>
               </DialogHeader>
               <AccountForm
+                key={editingAccount?.id || 'new'}
                 account={editingAccount || undefined}
                 onSuccess={() => {
                   setIsEditOpen(false)
-                  setEditingAccount(null)
+                  setTimeout(() => setEditingAccount(null), 200)
                   loadAccounts()
                 }}
               />
