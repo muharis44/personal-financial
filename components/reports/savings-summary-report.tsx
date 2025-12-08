@@ -33,7 +33,7 @@ export function SavingsSummaryReport() {
   });
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -73,7 +73,7 @@ export function SavingsSummaryReport() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-2xl font-bold text-primary truncate">
               {maskAmount(formatCurrency(totalTargetAmount))}
             </div>
           </CardContent>
@@ -86,7 +86,7 @@ export function SavingsSummaryReport() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">
+            <div className="text-2xl font-bold text-success truncate">
               {maskAmount(formatCurrency(totalCurrentAmount))}
             </div>
           </CardContent>
@@ -110,9 +110,9 @@ export function SavingsSummaryReport() {
                 <span className="font-semibold">{totalProgress.toFixed(1)}%</span>
               </div>
               <Progress value={totalProgress} className="h-3" />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{maskAmount(formatCurrency(totalCurrentAmount))}</span>
-                <span>{maskAmount(formatCurrency(totalTargetAmount))}</span>
+              <div className="flex justify-between text-xs text-muted-foreground gap-2">
+                <span className="truncate">{maskAmount(formatCurrency(totalCurrentAmount))}</span>
+                <span className="truncate">{maskAmount(formatCurrency(totalTargetAmount))}</span>
               </div>
             </div>
           </CardContent>
@@ -167,25 +167,25 @@ export function SavingsSummaryReport() {
 
                     <div className="space-y-2">
                       <Progress value={progress} className="h-2" />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>{maskAmount(formatCurrency(goal.currentAmount))}</span>
-                        <span>{maskAmount(formatCurrency(goal.targetAmount))}</span>
+                      <div className="flex justify-between text-xs text-muted-foreground gap-2">
+                        <span className="truncate">{maskAmount(formatCurrency(goal.currentAmount))}</span>
+                        <span className="truncate">{maskAmount(formatCurrency(goal.targetAmount))}</span>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-4 pt-2 text-sm">
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-warning" />
-                        <span className="text-muted-foreground">Sisa:</span>
-                        <span className="font-medium">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <TrendingUp className="h-3 w-3 text-warning shrink-0" />
+                        <span className="text-muted-foreground shrink-0">Sisa:</span>
+                        <span className="font-medium truncate">
                           {maskAmount(formatCurrency(remaining))}
                         </span>
                       </div>
                       {goal.deadline && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-info" />
-                          <span className="text-muted-foreground">Deadline:</span>
-                          <span className="font-medium">
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Calendar className="h-3 w-3 text-info shrink-0" />
+                          <span className="text-muted-foreground shrink-0">Deadline:</span>
+                          <span className="font-medium whitespace-nowrap">
                             {formatDate(goal.deadline)}
                           </span>
                           {daysLeft !== null && (

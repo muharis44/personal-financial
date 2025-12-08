@@ -83,7 +83,7 @@ export function DebtSummaryReport() {
     .slice(0, 5);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
       {/* Summary Cards */}
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -96,7 +96,7 @@ export function DebtSummaryReport() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-base sm:text-2xl font-bold text-green-600">
+            <div className="text-base sm:text-2xl font-bold text-green-600 truncate">
               {maskAmount(formatCurrency(totalReceivable))}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -115,7 +115,7 @@ export function DebtSummaryReport() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-base sm:text-2xl font-bold text-red-600">
+            <div className="text-base sm:text-2xl font-bold text-red-600 truncate">
               {maskAmount(formatCurrency(totalPayable))}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -143,7 +143,7 @@ export function DebtSummaryReport() {
           </CardHeader>
           <CardContent>
             <div
-              className={`text-base sm:text-2xl font-bold ${
+              className={`text-base sm:text-2xl font-bold truncate ${
                 balance >= 0 ? "text-primary" : "text-destructive"
               }`}
             >
@@ -206,17 +206,17 @@ export function DebtSummaryReport() {
                 {overdueDebts.slice(0, 5).map((debt) => (
                   <div
                     key={debt.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-2 sm:p-3"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-lg border border-destructive/20 bg-destructive/5 p-2 sm:p-3 min-w-0"
                   >
-                    <div>
-                      <p className="font-medium text-sm">{debt.personName}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{debt.personName}</p>
                       <p className="text-xs text-muted-foreground">
                         Jatuh tempo: {formatDate(debt.dueDate!)}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1">
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1 shrink-0">
                       <p
-                        className={`font-semibold text-sm ${
+                        className={`font-semibold text-sm whitespace-nowrap ${
                           debt.type === "receivable"
                             ? "text-green-600"
                             : "text-red-600"
@@ -228,7 +228,7 @@ export function DebtSummaryReport() {
                         variant={
                           debt.type === "receivable" ? "default" : "secondary"
                         }
-                        className="text-xs"
+                        className="text-xs whitespace-nowrap"
                       >
                         {debt.type === "receivable" ? "Piutang" : "Utang"}
                       </Badge>
@@ -263,17 +263,17 @@ export function DebtSummaryReport() {
                 {upcomingDebts.slice(0, 5).map((debt) => (
                   <div
                     key={debt.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-lg border p-2 sm:p-3"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-lg border p-2 sm:p-3 min-w-0"
                   >
-                    <div>
-                      <p className="font-medium text-sm">{debt.personName}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{debt.personName}</p>
                       <p className="text-xs text-muted-foreground">
                         Jatuh tempo: {formatDate(debt.dueDate!)}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1">
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-1 shrink-0">
                       <p
-                        className={`font-semibold text-sm ${
+                        className={`font-semibold text-sm whitespace-nowrap ${
                           debt.type === "receivable"
                             ? "text-green-600"
                             : "text-red-600"
@@ -285,7 +285,7 @@ export function DebtSummaryReport() {
                         variant={
                           debt.type === "receivable" ? "default" : "secondary"
                         }
-                        className="text-xs"
+                        className="text-xs whitespace-nowrap"
                       >
                         {debt.type === "receivable" ? "Piutang" : "Utang"}
                       </Badge>
@@ -322,7 +322,7 @@ export function DebtSummaryReport() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{name}</p>
                     </div>
-                    <p className="font-semibold text-green-600 text-sm shrink-0">
+                    <p className="font-semibold text-green-600 text-sm shrink-0 whitespace-nowrap">
                       {maskAmount(formatCurrency(amount))}
                     </p>
                   </div>
@@ -354,7 +354,7 @@ export function DebtSummaryReport() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{name}</p>
                     </div>
-                    <p className="font-semibold text-red-600 text-sm shrink-0">
+                    <p className="font-semibold text-red-600 text-sm shrink-0 whitespace-nowrap">
                       {maskAmount(formatCurrency(amount))}
                     </p>
                   </div>

@@ -50,7 +50,7 @@ export function RecurringSummaryReport() {
   const sortedActive = [...activeRecurring].sort((a, b) => b.amount - a.amount);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -74,9 +74,9 @@ export function RecurringSummaryReport() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-success" />
-              <span className="text-2xl font-bold text-success">
+            <div className="flex items-center gap-2 min-w-0">
+              <TrendingUp className="h-4 w-4 text-success shrink-0" />
+              <span className="text-2xl font-bold text-success truncate">
                 {maskAmount(formatCurrency(totalMonthlyIncome))}
               </span>
             </div>
@@ -90,9 +90,9 @@ export function RecurringSummaryReport() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-destructive" />
-              <span className="text-2xl font-bold text-destructive">
+            <div className="flex items-center gap-2 min-w-0">
+              <TrendingDown className="h-4 w-4 text-destructive shrink-0" />
+              <span className="text-2xl font-bold text-destructive truncate">
                 {maskAmount(formatCurrency(totalMonthlyExpense))}
               </span>
             </div>
@@ -106,10 +106,10 @@ export function RecurringSummaryReport() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
+            <div className="flex items-center gap-2 min-w-0">
+              <DollarSign className="h-4 w-4 shrink-0" />
               <span
-                className={`text-2xl font-bold ${
+                className={`text-2xl font-bold truncate ${
                   netCashFlow >= 0 ? "text-success" : "text-destructive"
                 }`}
               >
@@ -132,10 +132,10 @@ export function RecurringSummaryReport() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <TrendingUp className="h-4 w-4 text-success" />
-                  <span>Total Pemasukan Berulang</span>
+                  <TrendingUp className="h-4 w-4 text-success shrink-0" />
+                  <span className="truncate">Total Pemasukan Berulang</span>
                 </div>
-                <p className="text-2xl font-bold text-success">
+                <p className="text-2xl font-bold text-success truncate">
                   {maskAmount(formatCurrency(totalMonthlyIncome))}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -145,10 +145,10 @@ export function RecurringSummaryReport() {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                  <span>Total Pengeluaran Berulang</span>
+                  <TrendingDown className="h-4 w-4 text-destructive shrink-0" />
+                  <span className="truncate">Total Pengeluaran Berulang</span>
                 </div>
-                <p className="text-2xl font-bold text-destructive">
+                <p className="text-2xl font-bold text-destructive truncate">
                   {maskAmount(formatCurrency(totalMonthlyExpense))}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -158,10 +158,10 @@ export function RecurringSummaryReport() {
             </div>
 
             <div className="pt-4 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Arus Kas Bersih:</span>
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <span className="text-sm font-medium shrink-0">Arus Kas Bersih:</span>
                 <span
-                  className={`text-xl font-bold ${
+                  className={`text-xl font-bold truncate ${
                     netCashFlow >= 0 ? "text-success" : "text-destructive"
                   }`}
                 >
@@ -196,9 +196,9 @@ export function RecurringSummaryReport() {
               {sortedActive.map((recurring) => (
                 <div
                   key={recurring.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors min-w-0 gap-2"
                 >
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="flex items-start gap-3 flex-1 min-w-0 overflow-hidden">
                     <div
                       className={`rounded-lg p-2 ${
                         recurring.type === "income"
@@ -227,9 +227,9 @@ export function RecurringSummaryReport() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right ml-2">
+                  <div className="text-right shrink-0">
                     <p
-                      className={`text-lg font-bold ${
+                      className={`text-lg font-bold whitespace-nowrap ${
                         recurring.type === "income"
                           ? "text-success"
                           : "text-destructive"
@@ -239,7 +239,7 @@ export function RecurringSummaryReport() {
                       {maskAmount(formatCurrency(recurring.amount))}
                     </p>
                     {recurring.frequency !== "monthly" && (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">
                         ~{maskAmount(formatCurrency(recurring.amount))}/bulan
                       </p>
                     )}
