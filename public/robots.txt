@@ -1,0 +1,8 @@
+# Financial Personal Planner - Robots Configuration
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+
+# Sitemap
+Sitemap: https://yourapp.com/sitemap.xml

@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="patternGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGradient)"/>
+
+  <!-- Decorative Pattern -->
+  <path d="M 100 20 L 120 60 L 160 40 L 140 80 L 180 100 L 140 120 L 160 160 L 120 140 L 100 180 L 80 140 L 40 160 L 60 120 L 20 100 L 60 80 L 40 40 L 80 60 Z" fill="url(#patternGradient)" opacity="0.3"/>
+
+  <!-- FPP Text -->
+  <text x="100" y="115" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="64" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-2">FPP</text>
+
+  <!-- Subtitle -->
+  <text x="100" y="145" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="white" text-anchor="middle" opacity="0.9">Financial Personal Planner</text>
+</svg>
