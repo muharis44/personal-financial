@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
+import { ProgressBarProvider } from "@/components/progress-bar"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
 import { FinanceProvider } from "@/contexts/finance-context"
@@ -84,6 +85,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${inter.className} antialiased`}>
+        <ProgressBarProvider />
         <AuthProvider>
           <FinanceProvider>
             <PrivacyProvider>{children}</PrivacyProvider>
